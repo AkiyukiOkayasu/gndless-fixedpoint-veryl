@@ -25,7 +25,6 @@ pub proto package SignedFixedPointFormat {
     ///
     /// これはformatを表すタグ付きnewtypeではなく、実際のRTLに接続できるsigned bit vectorの別名である。`Q1_31::Raw`と`Q8_24::Raw`のようにformatが異なっても、幅とsignednessが同じならビットレベルでは同じ型になる
     type Raw = signed logic<WIDTH>;
-
     /// 数値0を表すraw値。常に`'0`である
     const ZERO: Raw;
     /// 表現可能な最小値。raw値では`-2^(WIDTH - 1)`に相当
@@ -102,10 +101,9 @@ pub package SignedFixedPointFormatOf::<W: u32, F: u32> for SignedFixedPointForma
     const WIDTH        : u32                 = W;
     const FRACTION_BITS: u32                 = F;
     type Raw           = signed logic<WIDTH>;
-
-    const ZERO: Raw = '0;
-    const MIN : Raw = {1'b1, 1'b0 repeat WIDTH - 1};
-    const MAX : Raw = {1'b0, 1'b1 repeat WIDTH - 1};
+    const ZERO         : Raw                 = '0;
+    const MIN          : Raw                 = {1'b1, 1'b0 repeat WIDTH - 1};
+    const MAX          : Raw                 = {1'b0, 1'b1 repeat WIDTH - 1};
 }
 
 /// Q2.16形式。27x18乗算器の係数用途
@@ -115,12 +113,37 @@ pub package Q2_16 for SignedFixedPointFormat {
     const WIDTH        : u32                 = 18;
     const FRACTION_BITS: u32                 = 16;
     type Raw           = signed logic<WIDTH>;
+    const MAX          : Raw                 = 18'sb01_11111111_11111111;
+    const MIN          : Raw                 = 18'sb10_00000000_00000000;
+    const ONE          : Raw                 = 18'sb01_00000000_00000000;
+    const NEG_ONE      : Raw                 = 18'sb11_00000000_00000000;
+    const ZERO         : Raw                 = 18'sd0;
+}
 
-    const MAX    : Raw = 18'sb01_11111111_11111111;
-    const MIN    : Raw = 18'sb10_00000000_00000000;
-    const ONE    : Raw = 18'sb01_00000000_00000000;
-    const NEG_ONE: Raw = 18'sb11_00000000_00000000;
-    const ZERO   : Raw = 18'sd0;
+/// Q1.23形式。ADATなどの24bit PCM wire format用途
+///
+/// raw値`x`の実数値は`x / 2^23`であり、表現可能な範囲は-1.0以上+1.0未満である
+pub package Q1_23 for SignedFixedPointFormat {
+    const WIDTH        : u32                 = 24;
+    const FRACTION_BITS: u32                 = 23;
+    type Raw           = signed logic<WIDTH>;
+    const MAX          : Raw                 = 24'sh7F_FFFF;
+    const MIN          : Raw                 = 24'sh80_0000;
+    const ZERO         : Raw                 = 24'sd0;
+}
+
+/// Q2.23形式。24bit PCMを1bit符号拡張して精度を保ったままASRC用のheadroomを確保する用途
+///
+/// raw値`x`の実数値は`x / 2^23`であり、表現可能な範囲は-2.0以上+2.0未満である
+pub package Q2_23 for SignedFixedPointFormat {
+    const WIDTH        : u32                 = 25;
+    const FRACTION_BITS: u32                 = 23;
+    type Raw           = signed logic<WIDTH>;
+    const MAX          : Raw                 = 25'sb01_11111111_11111111_1111111;
+    const MIN          : Raw                 = 25'sb10_00000000_00000000_0000000;
+    const ONE          : Raw                 = 25'sb01_00000000_00000000_0000000;
+    const NEG_ONE      : Raw                 = 25'sb11_00000000_00000000_0000000;
+    const ZERO         : Raw                 = 25'sd0;
 }
 
 /// Q1.31形式 (-1.0以上、+1.0未満)。デルタシグマ変調器などの用途
@@ -130,10 +153,9 @@ pub package Q1_31 for SignedFixedPointFormat {
     const WIDTH        : u32                 = 32;
     const FRACTION_BITS: u32                 = 31;
     type Raw           = signed logic<WIDTH>;
-
-    const MAX : Raw = 32'sh7FFF_FFFF;
-    const MIN : Raw = 32'sh8000_0000;
-    const ZERO: Raw = 32'sd0;
+    const MAX          : Raw                 = 32'sh7FFF_FFFF;
+    const MIN          : Raw                 = 32'sh8000_0000;
+    const ZERO         : Raw                 = 32'sd0;
 }
 
 /// Q8.24形式。波形オシレーターの出力などの用途
@@ -143,12 +165,11 @@ pub package Q8_24 for SignedFixedPointFormat {
     const WIDTH        : u32                 = 32;
     const FRACTION_BITS: u32                 = 24;
     type Raw           = signed logic<WIDTH>;
-
-    const MAX    : Raw = 32'sh7FFF_FFFF;
-    const MIN    : Raw = 32'sh8000_0000;
-    const ONE    : Raw = 32'sh0100_0000;
-    const NEG_ONE: Raw = 32'shFF00_0000;
-    const ZERO   : Raw = 32'sd0;
+    const MAX          : Raw                 = 32'sh7FFF_FFFF;
+    const MIN          : Raw                 = 32'sh8000_0000;
+    const ONE          : Raw                 = 32'sh0100_0000;
+    const NEG_ONE      : Raw                 = 32'shFF00_0000;
+    const ZERO         : Raw                 = 32'sd0;
 }
 
 /// Q8.19形式。36x27乗算器の係数用途
@@ -158,12 +179,11 @@ pub package Q8_19 for SignedFixedPointFormat {
     const WIDTH        : u32                 = 27;
     const FRACTION_BITS: u32                 = 19;
     type Raw           = signed logic<WIDTH>;
-
-    const MAX    : Raw = 27'sb01111111_111_11111111_11111111;
-    const MIN    : Raw = 27'sb10000000_000_00000000_00000000;
-    const ONE    : Raw = 27'sb00000001_000_00000000_00000000;
-    const NEG_ONE: Raw = 27'sb11111111_000_00000000_00000000;
-    const ZERO   : Raw = 27'sd0;
+    const MAX          : Raw                 = 27'sb01111111_111_11111111_11111111;
+    const MIN          : Raw                 = 27'sb10000000_000_00000000_00000000;
+    const ONE          : Raw                 = 27'sb00000001_000_00000000_00000000;
+    const NEG_ONE      : Raw                 = 27'sb11111111_000_00000000_00000000;
+    const ZERO         : Raw                 = 27'sd0;
 }
 
 /// Q3.24形式。36x27乗算器の係数用途
@@ -173,12 +193,45 @@ pub package Q3_24 for SignedFixedPointFormat {
     const WIDTH        : u32                 = 27;
     const FRACTION_BITS: u32                 = 24;
     type Raw           = signed logic<WIDTH>;
+    const MAX          : Raw                 = 27'sb011_11111111_11111111_11111111;
+    const MIN          : Raw                 = 27'sb100_00000000_00000000_00000000;
+    const ONE          : Raw                 = 27'sb001_00000000_00000000_00000000;
+    const NEG_ONE      : Raw                 = 27'sb111_00000000_00000000_00000000;
+    const ZERO         : Raw                 = 27'sd0;
+}
 
-    const MAX    : Raw = 27'sb011_11111111_11111111_11111111;
-    const MIN    : Raw = 27'sb100_00000000_00000000_00000000;
-    const ONE    : Raw = 27'sb001_00000000_00000000_00000000;
-    const NEG_ONE: Raw = 27'sb111_00000000_00000000_00000000;
-    const ZERO   : Raw = 27'sd0;
+/// formatをmodule境界へ保持する1 sample interface
+///
+/// `input_port`はsampleを受け取り、`output_port`はsampleを駆動する。interface genericが異なる接続はコンパイル時に拒否されるため、Q1.23 PCMとQ2.23 ASRC処理formatの境界を明示できる
+pub interface FixedPointPort::<FORMAT: SignedFixedPointFormat> {
+    /// `FORMAT`で解釈する2の補数sample値
+    var raw: FORMAT::Raw;
+
+    modport input_port {
+        raw: input,
+    }
+
+    modport output_port {
+        raw: output,
+    }
+}
+
+/// 異なるfixed-point formatのsample interfaceを明示的に接続する組み合わせconverter
+///
+/// Q1.23 PCMからQ2.23 ASRC処理formatへは符号拡張だけで精度を保持する。逆方向では`MODE`と`OVERFLOW`に従って丸め・飽和する
+pub module FixedPointSampleConverter::<
+    IN_FORMAT : SignedFixedPointFormat = Q1_23,
+    OUT_FORMAT: SignedFixedPointFormat = Q2_23,
+> #(
+    param MODE    : Types::RoundingMode = Types::RoundingMode::NEAREST_TIES_TO_EVEN,
+    param OVERFLOW: Types::OverflowMode = Types::OverflowMode::SATURATE            ,
+) (
+    input_sample : modport FixedPointPort::<IN_FORMAT>::input_port  , /// 入力formatのsample
+    output_sample: modport FixedPointPort::<OUT_FORMAT>::output_port, /// 出力formatのsample
+) {
+    always_comb {
+        output_sample.raw = convert::<IN_FORMAT, OUT_FORMAT, MODE, OVERFLOW>(input_sample.raw);
+    }
 }
 
 /// signed固定小数点値を小数ビット数と出力幅ごと変換するproject-scope function
@@ -887,19 +940,35 @@ module test_fixed_point_generic_api {
 module test_fixed_point_convert {
     inst clk: $tb::clock_gen;
 
-    var q1_input      : Q1_31::Raw                           ;
-    var q8_output     : Q8_24::Raw                           ;
-    var generic_input : SignedFixedPointFormatOf::<8, 4>::Raw;
-    var generic_output: SignedFixedPointFormatOf::<8, 2>::Raw;
+    var q1_input       : Q1_31::Raw                           ;
+    var q8_output      : Q8_24::Raw                           ;
+    var q1_23_input    : Q1_23::Raw                           ;
+    var q2_23_output   : Q2_23::Raw                           ;
+    var q1_23_roundtrip: Q1_23::Raw                           ;
+    var q2_23_input    : Q2_23::Raw                           ;
+    var generic_input  : SignedFixedPointFormatOf::<8, 4>::Raw;
+    var generic_output : SignedFixedPointFormatOf::<8, 2>::Raw;
 
     always_comb {
-        q8_output      = convert::<
+        q8_output       = convert::<
             Q1_31                                           ,
             Q8_24                                           ,
             Types::RoundingMode::NEAREST_TIES_AWAY_FROM_ZERO,
             Types::OverflowMode::SATURATE                   ,
         >(q1_input);
-        generic_output = convert::<
+        q2_23_output    = convert::<
+            Q1_23                                           ,
+            Q2_23                                           ,
+            Types::RoundingMode::NEAREST_TIES_AWAY_FROM_ZERO,
+            Types::OverflowMode::SATURATE                   ,
+        >(q1_23_input);
+        q1_23_roundtrip = convert::<
+            Q2_23                                    ,
+            Q1_23                                    ,
+            Types::RoundingMode::NEAREST_TIES_TO_EVEN,
+            Types::OverflowMode::SATURATE            ,
+        >(q2_23_input);
+        generic_output  = convert::<
             SignedFixedPointFormatOf::<8, 4>,
             SignedFixedPointFormatOf::<8, 2>,
             Types::RoundingMode::NEAREST_TIES_AWAY_FROM_ZERO,
@@ -909,16 +978,50 @@ module test_fixed_point_convert {
 
     initial {
         q1_input      = 32'sh4000_0000;
+        q1_23_input   = 24'sh400000;
         generic_input = 10;
         clk.next();
         $assert(q8_output == 32'sh0080_0000, "typed format conversion mismatch");
+        $assert(q2_23_output == 25'sh0400000, "Q1.23 to Q2.23 positive conversion mismatch");
         $assert(generic_output == 8'sd3, "generic format conversion mismatch");
 
         q1_input      = -32'sh4000_0000;
+        q1_23_input   = -24'sh400000;
         generic_input = -10;
         clk.next();
         $assert(q8_output == -32'sh0080_0000, "typed negative conversion mismatch");
+        $assert(q2_23_output == -25'sh0400000, "Q1.23 to Q2.23 negative conversion mismatch");
         $assert(generic_output == -8'sd3, "generic negative conversion mismatch");
+
+        q2_23_input = 25'sh0C00000;
+        clk.next();
+        $assert(q1_23_roundtrip == Q1_23::MAX, "Q2.23 positive overshoot must saturate to Q1.23 maximum");
+
+        q2_23_input = -25'sh0C00000;
+        clk.next();
+        $assert(q1_23_roundtrip == Q1_23::MIN, "Q2.23 negative overshoot must saturate to Q1.23 minimum");
+
+        $finish();
+    }
+}
+
+/// format付きstream converterのQ1.23からQ2.23への符号拡張を検証
+#[test(test_fixed_point_sample_converter)]
+module test_fixed_point_sample_converter {
+    inst clk          : $tb::clock_gen;
+    inst input_sample : FixedPointPort::<Q1_23>;
+    inst output_sample: FixedPointPort::<Q2_23>;
+
+    inst dut: FixedPointSampleConverter::<Q1_23, Q2_23> ( input_sample, output_sample );
+
+    initial {
+        input_sample.raw = Q1_23::MAX;
+        clk.next();
+        $assert(output_sample.raw == 25'sh07F_FFFF, "Q1.23 maximum must sign-extend into Q2.23");
+
+        input_sample.raw = Q1_23::MIN;
+        clk.next();
+        $assert(output_sample.raw == -25'sh080_0000, "Q1.23 minimum must sign-extend into Q2.23");
 
         $finish();
     }
@@ -927,23 +1030,31 @@ module test_fixed_point_convert {
 /// 名前付きQ形式presetによるformat定数とRaw型の提供を検証
 #[test(test_fixed_point_presets)]
 module test_fixed_point_presets {
+    var q1_23: Q1_23::Raw;
     var q1_31: Q1_31::Raw;
     var q2_16: Q2_16::Raw;
+    var q2_23: Q2_23::Raw;
     var q8_24: Q8_24::Raw;
     var q8_19: Q8_19::Raw;
     var q3_24: Q3_24::Raw;
 
     initial {
+        q1_23 = Q1_23::MAX;
         q1_31 = Q1_31::MIN;
         q2_16 = Q2_16::ONE;
+        q2_23 = Q2_23::ONE;
         q8_24 = Q8_24::NEG_ONE;
         q8_19 = Q8_19::ONE;
         q3_24 = Q3_24::NEG_ONE;
 
+        $assert(Q1_23::WIDTH == 24 && Q1_23::FRACTION_BITS == 23, "Q1.23 format mismatch");
+        $assert(q1_23 == Q1_23::MAX, "Q1.23 preset constant mismatch");
         $assert(Q1_31::WIDTH == 32 && Q1_31::FRACTION_BITS == 31, "Q1.31 format mismatch");
         $assert(q1_31 == Q1_31::MIN, "Q1.31 preset constant mismatch");
         $assert(Q2_16::WIDTH == 18 && Q2_16::FRACTION_BITS == 16, "Q2.16 format mismatch");
         $assert(q2_16 == 18'sh01_0000, "Q2.16 preset constant mismatch");
+        $assert(Q2_23::WIDTH == 25 && Q2_23::FRACTION_BITS == 23, "Q2.23 format mismatch");
+        $assert(q2_23 == 25'sh0800000, "Q2.23 preset constant mismatch");
         $assert(Q8_24::WIDTH == 32 && Q8_24::FRACTION_BITS == 24, "Q8.24 format mismatch");
         $assert(q8_24 == Q8_24::NEG_ONE, "Q8.24 preset constant mismatch");
         $assert(Q8_19::WIDTH == 27 && Q8_19::FRACTION_BITS == 19, "Q8.19 format mismatch");

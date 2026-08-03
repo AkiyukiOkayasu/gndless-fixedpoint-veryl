@@ -9,8 +9,14 @@
 - doc commentのsection見出しをRustdoc準拠の英語表記へ統一
 - 各testのdoc commentを検証目的が分かる表現へ統一
 
+### Added
+
+- 24bit PCMを1bit符号拡張してASRCのheadroomを確保できる`Q2_23` presetを追加
+- ADAT PCM境界用の24bit `Q1_23` preset、format付きstream接続用の`FixedPointPort::<FORMAT>` interface、Q1.23/Q2.23間を明示接続する`FixedPointSampleConverter`を追加
+
 ### Changed
 
+- 破壊的変更: `SignedFixedPointFormat::Sample`と`convert_sample`を削除。public stream portは`FixedPointPort::<FORMAT>`、内部payloadは`FORMAT::Raw`へ整理
 - 公開policy packageをproject名と重複する`FixedPoint`から`Types`へ改名
 - monorepo内の`packages/fixedpoint/` inner projectとして他packageから直接参照する構成を確定
 - raw generic演算をproject-scope functionへ統一し、parameterized moduleから直接利用可能に変更

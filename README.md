@@ -12,6 +12,11 @@ resize、変換、全幅乗算を提供します。演算はすべてproject-sco
 `fixedpoint::resize::<...>`のようにmodule parameterを直接渡せます。format間の変換には
 `fixedpoint::convert::<Q1_31, Q8_24, ...>`のようにformat packageを指定します。
 
+公開stream境界には`FixedPointPort::<FORMAT>` interfaceを使います。ADATのQ1.23と
+ASRC処理のQ2.23のようにformatが異なるstreamは直接接続せず、
+`FixedPointSampleConverter::<Q1_23, Q2_23>`を標準adapterとして挿入します。内部FIFOや
+演算payloadは`FORMAT::Raw`を使います。
+
 `round_shift`と`saturate`は、用途に不要なgeneric引数を指定させない
 `resize`の安全な専用APIです。`multiply`はVerylの式幅に依存せず
 `A_WIDTH + B_WIDTH`の全幅積を返し、`multiply_resize`は全幅積から出力formatへの
@@ -24,7 +29,7 @@ resize、変換、全幅乗算を提供します。演算はすべてproject-sco
 fixedpoint = {
     project = "gndless_fixedpoint",
     github = "AkiyukiOkayasu/gndless-fixedpoint-veryl",
-    version = "0.1.0"
+    version = "0.2.0"
 }
 ```
 
