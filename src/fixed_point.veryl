@@ -257,7 +257,38 @@ pub interface FixedPointValue::<FORMAT: SignedFixedPointFormat> {
 
 /// 異なるfixed-point formatのvalue interfaceを明示的に接続する組み合わせconverter
 ///
-/// Q1.23 PCMからQ2.23 ASRC処理formatへは符号拡張だけで精度を保持する。逆方向では`MODE`と`OVERFLOW`に従って丸め・飽和する
+/// `FormatConverter`は`convert`関数を`FixedPointValue` interfaceの接続へ載せるための薄いmoduleである。
+/// 実装は組み合わせ回路であり、次の代入と等価である。
+///
+/// ```veryl
+/// output_sample.raw = convert::<IN_FORMAT, OUT_FORMAT, MODE, OVERFLOW>(input_sample.raw);
+/// ```
+///
+/// ## Usage
+///
+/// `FixedPointValue::<IN_FORMAT>`から`FixedPointValue::<OUT_FORMAT>`へ接続したいmodule境界では`FormatConverter`を使う。
+/// 逆方向や小数ビットを減らす変換では、`MODE`と`OVERFLOW`に従って丸め・飽和またはwrapを行う。
+/// interfaceを使わない内部演算や一時変数では、`convert`を直接呼ぶ方が簡潔である。
+///
+/// ## Timing
+///
+/// `FormatConverter`はregisterを挿入しないため、変換処理はそのまま組み合わせtiming pathになる。重い丸めや飽和を高いFmaxの経路に置く場合は、利用側でpipeline registerを挟むんでconvert()やシフト演算を行う方がよい。
+///
+/// # Examples
+///
+/// ```veryl
+/// module ExampleTop {
+///     import gndless_fixedpoint::{FixedPointValue, FormatConverter, Q1_23, Q2_23};
+///
+///     inst source_sample  : FixedPointValue::<Q1_23>;
+///     inst internal_sample: FixedPointValue::<Q2_23>;
+///
+///     inst input_converter: FormatConverter::<Q1_23, Q2_23> (
+///         source_sample  ,
+///         internal_sample,
+///     );
+/// }
+/// ```
 pub module FormatConverter::<IN_FORMAT: SignedFixedPointFormat = Q1_23, OUT_FORMAT: SignedFixedPointFormat = Q2_23> #(
     param MODE    : Types::RoundingMode = Types::RoundingMode::NEAREST_TIES_TO_EVEN,
     param OVERFLOW: Types::OverflowMode = Types::OverflowMode::SATURATE            ,
