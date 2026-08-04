@@ -200,9 +200,48 @@ pub package Q3_24 for SignedFixedPointFormat {
     const ZERO         : Raw                 = 27'sd0;
 }
 
-/// formatをmodule境界へ保持するscalar fixed-point value interface
+/// 固定小数点数フォーマットの接続を型として表現するinterface
 ///
-/// `input_port`はsampleを受け取り、`output_port`はsampleを駆動する。interface genericが異なる接続はコンパイル時に拒否されるため、Q1.23 PCMとQ2.23 ASRC処理formatの境界を明示できる
+/// `FixedPointValue`は`FORMAT::Raw`を1本だけ持つ薄いinterfaceである。
+///
+/// ## Format::Rawとの違い
+///
+/// 算術演算や値の表現能力は`Format::Raw`などと同じ。
+/// たとえばQ8_24::Rawはsigned logic<32>のaliasであり、Q1_31::Rawもsigned logic<32>のaliasであるため、ビット幅が同じである。したがって、Q8_24::Rawの出力をQ1_31::Rawの入力へ直接接続することは、コンパイルエラーにならない。
+/// FixedPointValue::<FORMAT>を使うとinterfaceとして入出力の型を保持できるため、異なるformatの誤接続を防ぐことができる。
+///
+/// 明示的なフォーマット変換は`FormatConverter`を使う。
+///
+/// # Examples
+///
+/// ```veryl
+/// module ExampleTop {
+///     import gndless_fixedpoint::{FixedPointValue, FormatConverter, Q1_23, Q2_23};
+///
+///     inst source_sample   : FixedPointValue::<Q1_23>;
+///     inst internal_sample : FixedPointValue::<Q2_23>;
+///     inst processed_sample: FixedPointValue::<Q2_23>;
+///
+///     inst source: SampleSource::<Q1_23> (
+///         output_sample: source_sample,
+///     );
+///
+///     // Q1_23からQ2_23へのフォーマット変換
+///     inst input_converter: FormatConverter::<Q1_23, Q2_23> (
+///         source_sample  ,
+///         internal_sample,
+///     );
+///
+///     inst processor: SampleProcessor::<Q2_23> (
+///         input_sample : internal_sample ,
+///         output_sample: processed_sample,
+///     );
+///
+///     inst sink: SampleSink::<Q2_23> (
+///         input_sample: processed_sample,
+///     );
+/// }
+/// ```
 pub interface FixedPointValue::<FORMAT: SignedFixedPointFormat> {
     /// `FORMAT`で解釈する2の補数sample値
     var raw: FORMAT::Raw;
