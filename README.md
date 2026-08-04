@@ -12,9 +12,9 @@ resize、変換、全幅乗算を提供します。演算はすべてproject-sco
 `fixedpoint::resize::<...>`のようにmodule parameterを直接渡せます。format間の変換には
 `fixedpoint::convert::<Q1_31, Q8_24, ...>`のようにformat packageを指定します。
 
-公開stream境界には`FixedPointPort::<FORMAT>` interfaceを使います。ADATのQ1.23と
-ASRC処理のQ2.23のようにformatが異なるstreamは直接接続せず、
-`FixedPointSampleConverter::<Q1_23, Q2_23>`を標準adapterとして挿入します。内部FIFOや
+公開value境界には`FixedPointValue::<FORMAT>` interfaceを使います。ADATのQ1.23と
+ASRC処理のQ2.23のようにformatが異なるvalue interfaceは直接接続せず、
+`FormatConverter::<Q1_23, Q2_23>`を標準adapterとして挿入します。内部FIFOや
 演算payloadは`FORMAT::Raw`を使います。
 
 `round_shift`と`saturate`は、用途に不要なgeneric引数を指定させない

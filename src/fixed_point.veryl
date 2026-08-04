@@ -200,10 +200,10 @@ pub package Q3_24 for SignedFixedPointFormat {
     const ZERO         : Raw                 = 27'sd0;
 }
 
-/// formatをmodule境界へ保持する1 sample interface
+/// formatをmodule境界へ保持するscalar fixed-point value interface
 ///
 /// `input_port`はsampleを受け取り、`output_port`はsampleを駆動する。interface genericが異なる接続はコンパイル時に拒否されるため、Q1.23 PCMとQ2.23 ASRC処理formatの境界を明示できる
-pub interface FixedPointPort::<FORMAT: SignedFixedPointFormat> {
+pub interface FixedPointValue::<FORMAT: SignedFixedPointFormat> {
     /// `FORMAT`で解釈する2の補数sample値
     var raw: FORMAT::Raw;
 
@@ -216,18 +216,15 @@ pub interface FixedPointPort::<FORMAT: SignedFixedPointFormat> {
     }
 }
 
-/// 異なるfixed-point formatのsample interfaceを明示的に接続する組み合わせconverter
+/// 異なるfixed-point formatのvalue interfaceを明示的に接続する組み合わせconverter
 ///
 /// Q1.23 PCMからQ2.23 ASRC処理formatへは符号拡張だけで精度を保持する。逆方向では`MODE`と`OVERFLOW`に従って丸め・飽和する
-pub module FixedPointSampleConverter::<
-    IN_FORMAT : SignedFixedPointFormat = Q1_23,
-    OUT_FORMAT: SignedFixedPointFormat = Q2_23,
-> #(
+pub module FormatConverter::<IN_FORMAT: SignedFixedPointFormat = Q1_23, OUT_FORMAT: SignedFixedPointFormat = Q2_23> #(
     param MODE    : Types::RoundingMode = Types::RoundingMode::NEAREST_TIES_TO_EVEN,
     param OVERFLOW: Types::OverflowMode = Types::OverflowMode::SATURATE            ,
 ) (
-    input_sample : modport FixedPointPort::<IN_FORMAT>::input_port  , /// 入力formatのsample
-    output_sample: modport FixedPointPort::<OUT_FORMAT>::output_port, /// 出力formatのsample
+    input_sample : modport FixedPointValue::<IN_FORMAT>::input_port  , /// 入力formatのsample
+    output_sample: modport FixedPointValue::<OUT_FORMAT>::output_port, /// 出力formatのsample
 ) {
     always_comb {
         output_sample.raw = convert::<IN_FORMAT, OUT_FORMAT, MODE, OVERFLOW>(input_sample.raw);
@@ -1005,14 +1002,14 @@ module test_fixed_point_convert {
     }
 }
 
-/// format付きstream converterのQ1.23からQ2.23への符号拡張を検証
-#[test(test_fixed_point_sample_converter)]
-module test_fixed_point_sample_converter {
+/// format付きvalue converterのQ1.23からQ2.23への符号拡張を検証
+#[test(test_fixed_point_converter)]
+module test_fixed_point_converter {
     inst clk          : $tb::clock_gen;
-    inst input_sample : FixedPointPort::<Q1_23>;
-    inst output_sample: FixedPointPort::<Q2_23>;
+    inst input_sample : FixedPointValue::<Q1_23>;
+    inst output_sample: FixedPointValue::<Q2_23>;
 
-    inst dut: FixedPointSampleConverter::<Q1_23, Q2_23> ( input_sample, output_sample );
+    inst dut: FormatConverter::<Q1_23, Q2_23> ( input_sample, output_sample );
 
     initial {
         input_sample.raw = Q1_23::MAX;
