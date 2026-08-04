@@ -120,9 +120,10 @@ pub package Q2_16 for SignedFixedPointFormat {
     const ZERO         : Raw                 = 18'sd0;
 }
 
-/// Q1.23形式。ADATなどの24bit PCM wire format用途
+/// Q1.23形式。24bit PCMオーディオのサンプル値などの用途。
 ///
 /// raw値`x`の実数値は`x / 2^23`であり、表現可能な範囲は-1.0以上+1.0未満である
+/// Q1_23::ONEは定義されない。+1.0は表現範囲外のため、必要時はQ1_23::MAXを利用
 pub package Q1_23 for SignedFixedPointFormat {
     const WIDTH        : u32                 = 24;
     const FRACTION_BITS: u32                 = 23;
@@ -132,7 +133,7 @@ pub package Q1_23 for SignedFixedPointFormat {
     const ZERO         : Raw                 = 24'sd0;
 }
 
-/// Q2.23形式。24bit PCMを1bit符号拡張して精度を保ったままASRC用のheadroomを確保する用途
+/// Q2.23形式。24bit PCMを1bit符号拡張して精度を保ったままヘッドルームを追加したもの
 ///
 /// raw値`x`の実数値は`x / 2^23`であり、表現可能な範囲は-2.0以上+2.0未満である
 pub package Q2_23 for SignedFixedPointFormat {
