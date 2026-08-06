@@ -215,6 +215,20 @@ pub package Q3_24 for SignedFixedPointFormat {
     const ZERO         : Raw                 = 27'sd0;
 }
 
+/// Q4.23形式。±1.0信号を±8.0の範囲で扱うmodule境界の統一format用途
+///
+/// raw値`x`の実数値は`x / 2^23`であり、表現可能な範囲は-8.0以上+8.0未満である
+pub package Q4_23 for SignedFixedPointFormat {
+    const WIDTH        : u32                 = 27;
+    const FRACTION_BITS: u32                 = 23;
+    type Raw           = signed logic<WIDTH>;
+    const MAX          : Raw                 = 27'sb0111_1111111_11111111_11111111;
+    const MIN          : Raw                 = 27'sb1000_0000000_00000000_00000000;
+    const ONE          : Raw                 = 27'sb0001_0000000_00000000_00000000;
+    const NEG_ONE      : Raw                 = 27'sb1111_0000000_00000000_00000000;
+    const ZERO         : Raw                 = 27'sd0;
+}
+
 /// 固定小数点数フォーマットの接続を型として表現するinterface
 ///
 /// `FixedPointValue`は`FORMAT::Raw`を1本だけ持つ薄いinterfaceである。
@@ -1119,6 +1133,7 @@ module test_fixed_point_presets {
     var q8_24: Q8_24::Raw;
     var q8_19: Q8_19::Raw;
     var q3_24: Q3_24::Raw;
+    var q4_23: Q4_23::Raw;
 
     initial {
         q1_23 = Q1_23::MAX;
@@ -1128,6 +1143,7 @@ module test_fixed_point_presets {
         q8_24 = Q8_24::NEG_ONE;
         q8_19 = Q8_19::ONE;
         q3_24 = Q3_24::NEG_ONE;
+        q4_23 = Q4_23::NEG_ONE;
 
         $assert(Q1_23::WIDTH == 24 && Q1_23::FRACTION_BITS == 23, "Q1.23 format mismatch");
         $assert(q1_23 == Q1_23::MAX, "Q1.23 preset constant mismatch");
@@ -1143,6 +1159,8 @@ module test_fixed_point_presets {
         $assert(q8_19 == Q8_19::ONE, "Q8.19 preset constant mismatch");
         $assert(Q3_24::WIDTH == 27 && Q3_24::FRACTION_BITS == 24, "Q3.24 format mismatch");
         $assert(q3_24 == Q3_24::NEG_ONE, "Q3.24 preset constant mismatch");
+        $assert(Q4_23::WIDTH == 27 && Q4_23::FRACTION_BITS == 23, "Q4.23 format mismatch");
+        $assert(q4_23 == Q4_23::NEG_ONE, "Q4.23 preset constant mismatch");
         $assert(Q1_31::MAX == 32'sh7FFF_FFFF, "Q1.31 maximum mismatch");
         $assert(Q8_24::MIN == 32'sh8000_0000, "Q8.24 minimum mismatch");
 
