@@ -1,6 +1,6 @@
 [project]
 name = "gndless_fixedpoint"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Akiyuki Okayasu"]
 description = "Generic signed fixed-point arithmetic utilities for Veryl."
 license = "MIT OR Apache-2.0"
