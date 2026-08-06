@@ -129,7 +129,7 @@ pub package Q1_17 for SignedFixedPointFormat {
     const FRACTION_BITS: u32                 = 17;
     type Raw           = signed logic<WIDTH>;
     const MAX          : Raw                 = 18'sb01_11111111_11111111;
-    const MIN          : Raw                 = 18'sb10_00000000_00000000; 
+    const MIN          : Raw                 = 18'sb10_00000000_00000000;
     const NEG_ONE      : Raw                 = 18'sb11_00000000_00000000;
     const ZERO         : Raw                 = 18'sd0;
 }
