@@ -120,6 +120,20 @@ pub package Q2_16 for SignedFixedPointFormat {
     const ZERO         : Raw                 = 18'sd0;
 }
 
+/// Q1.17形式。27x18乗算器の係数用途
+///
+/// raw値`x`の実数値は`x / 2^17`であり、表現可能な範囲は-1.0以上+1.0未満である
+/// Q1_17::ONEは定義されない。+1.0は表現範囲外のため、必要時はQ1_17::MAXを利用
+pub package Q1_17 for SignedFixedPointFormat {
+    const WIDTH        : u32                 = 18;
+    const FRACTION_BITS: u32                 = 17;
+    type Raw           = signed logic<WIDTH>;
+    const MAX          : Raw                 = 18'sb01_11111111_11111111;
+    const MIN          : Raw                 = 18'sb10_00000000_00000000; 
+    const NEG_ONE      : Raw                 = 18'sb11_00000000_00000000;
+    const ZERO         : Raw                 = 18'sd0;
+}
+
 /// Q1.23形式。24bit PCMオーディオのサンプル値などの用途。
 ///
 /// raw値`x`の実数値は`x / 2^23`であり、表現可能な範囲は-1.0以上+1.0未満である
