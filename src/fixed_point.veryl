@@ -173,7 +173,7 @@ pub package Q1_31 for SignedFixedPointFormat {
     const ZERO         : Raw                 = 32'sd0;
 }
 
-/// Q8.24形式。波形オシレーターの出力などの用途
+/// Q8.24形式。ヘッドルームと小数精度を広く取った32bit固定小数点数
 ///
 /// raw値`x`の実数値は`x / 2^24`である
 pub package Q8_24 for SignedFixedPointFormat {
