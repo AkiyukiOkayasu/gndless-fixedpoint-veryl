@@ -8,9 +8,10 @@ resize、変換、全幅乗算を提供します。演算はすべてproject-sco
 `signed logic<WIDTH>`として扱い、format間の変換はformat-aware APIで明示します。
 
 公開APIは`round_shift`、`saturate`、`resize`、`convert`、
-`multiply`、`multiply_resize`です。parameterized moduleからは
-`fixedpoint::resize::<...>`のようにmodule parameterを直接渡せます。format間の変換には
-`fixedpoint::convert::<Q1_31, Q8_24, ...>`のようにformat packageを指定します。
+`multiply`、`multiply_resize`です。利用側は`import gndless_fixedpoint::resize;`のように
+project-scope functionをimportして呼び出します。parameterized moduleからはmodule parameterを
+generic引数へ直接渡せます。format間の変換には`convert::<Q1_31, Q8_24, ...>`のように
+format packageを指定します。
 
 公開value境界には`FixedPointValue::<FORMAT>` interfaceを使います。ADATのQ1.23と
 ASRC処理のQ2.23のようにformatが異なるvalue interfaceは直接接続せず、
@@ -26,15 +27,14 @@ ASRC処理のQ2.23のようにformatが異なるvalue interfaceは直接接続�
 
 ```toml
 [dependencies]
-fixedpoint = {
-    project = "gndless_fixedpoint",
+gndless_fixedpoint = {
     github = "AkiyukiOkayasu/gndless-fixedpoint-veryl",
-    version = "0.2.0"
+    version = "0.2.2"
 }
 ```
 
 ```veryl
-import fixedpoint::*;
+import gndless_fixedpoint::{convert, Q1_31, Q8_24, Types};
 
 let input : Q1_31::Raw;
 let output: Q8_24::Raw;
@@ -49,9 +49,7 @@ assign output = convert::<
 
 ## 開発
 
-現在は`groundless_veryl_cores`リポジトリ内のinner projectとして開発しています。
-APIとリリース手順が安定した後、
-`AkiyukiOkayasu/gndless-fixedpoint-veryl`へ分離する予定です。
+このpackageは`AkiyukiOkayasu/gndless-fixedpoint-veryl`で独立して開発・公開しています。
 
 ## 検証
 
