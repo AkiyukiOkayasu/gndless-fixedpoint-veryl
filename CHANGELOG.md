@@ -2,6 +2,16 @@
 
 このプロジェクトの注目すべき変更を記録します。
 
+## [Unreleased]
+
+### Added
+
+- saturation、左シフト飽和、符号付き乗算の境界testを追加した
+
+### Fixed
+
+- `FormatConverter`のdoc commentの誤字を修正した
+
 ## [0.2.2] - 2026-08-07
 
 ### Added

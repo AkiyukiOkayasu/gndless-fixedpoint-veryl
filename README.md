@@ -53,4 +53,4 @@ assign output = convert::<
 
 ## 検証
 
-`veryl check && veryl test && veryl build && veryl doc`。
+`veryl fmt --check && veryl check && veryl test && veryl build && veryl doc`。

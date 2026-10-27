@@ -301,7 +301,7 @@ pub interface FixedPointValue::<FORMAT: SignedFixedPointFormat> {
 ///
 /// ## Timing
 ///
-/// `FormatConverter`はregisterを挿入しないため、変換処理はそのまま組み合わせtiming pathになる。重い丸めや飽和を高いFmaxの経路に置く場合は、利用側でpipeline registerを挟むんでconvert()やシフト演算を行う方がよい。
+/// `FormatConverter`はregisterを挿入しないため、変換処理はそのまま組み合わせtiming pathになる。重い丸めや飽和を高いFmaxの経路に置く場合は、利用側でpipeline registerを挟んでconvert()やシフト演算を行う方がよい。
 ///
 /// # Examples
 ///
@@ -1164,6 +1164,45 @@ module test_fixed_point_presets {
         $assert(Q1_31::MAX == 32'sh7FFF_FFFF, "Q1.31 maximum mismatch");
         $assert(Q8_24::MIN == 32'sh8000_0000, "Q8.24 minimum mismatch");
 
+        $finish();
+    }
+}
+
+/// saturation、左シフト飽和、符号付き乗算の境界を検証
+#[test(test_fixed_point_boundaries)]
+module test_fixed_point_boundaries {
+    inst clk: $tb::clock_gen;
+
+    var sat_input  : signed logic<8> ;
+    var sat_output : signed logic<4> ;
+    var left_input : signed logic<8> ;
+    var left_output: signed logic<8> ;
+    var mul_a      : signed logic<8> ;
+    var mul_b      : signed logic<8> ;
+    var product    : signed logic<16>;
+
+    always_comb {
+        sat_output  = saturate::<8, 4>(sat_input);
+        left_output = resize::<8, 4, 8, 6, Types::RoundingMode::TOWARD_ZERO, Types::OverflowMode::SATURATE>(left_input);
+        product     = multiply::<8, 8>(mul_a, mul_b);
+    }
+
+    initial {
+        sat_input  = 8'sd127;
+        left_input = 8'sd127;
+        mul_a      = -8'sd128;
+        mul_b      = -8'sd128;
+        clk.next(1);
+        $assert(sat_output == 4'sd7, "positive saturation boundary mismatch");
+        $assert(left_output == 8'sd127, "left-shift saturation boundary mismatch");
+        $assert(product == 16'sd16384, "minimum times minimum product mismatch");
+
+        sat_input = -8'sd128;
+        mul_a     = 8'sd127;
+        mul_b     = 8'sd127;
+        clk.next(1);
+        $assert(sat_output == -4'sd8, "negative saturation boundary mismatch");
+        $assert(product == 16'sd16129, "maximum times maximum product mismatch");
         $finish();
     }
 }
